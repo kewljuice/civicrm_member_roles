@@ -73,5 +73,8 @@ function civicrm_member_roles_civicrm_post($op, $objname, $objid, &$objref) {
 
   /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
   $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
-  $civicrm_member_roles->syncContact($objref->contact_id, $civicrm_member_roles->getContactAccount($objref->contact_id));
+  // Check if CiviCRM contact has Drupal account.
+  if ($civicrm_member_roles->getContactAccount($objref->contact_id) !== NULL) {
+    $civicrm_member_roles->syncContact($objref->contact_id, $civicrm_member_roles->getContactAccount($objref->contact_id));
+  }
 }
