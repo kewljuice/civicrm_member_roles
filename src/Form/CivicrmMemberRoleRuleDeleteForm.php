@@ -37,15 +37,8 @@ class CivicrmMemberRoleRuleDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-
-    drupal_set_message(
-      $this->t('Deleted association rule @label.',
-        [
-          '@label' => $this->entity->label(),
-        ]
-      )
-    );
-
+    $message = $this->t('Deleted association rule @label.', ['@label' => $this->entity->label()]);
+    \Drupal::messenger()->addStatus($message);
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

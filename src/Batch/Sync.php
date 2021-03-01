@@ -7,6 +7,7 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * Class Sync.
@@ -31,6 +32,13 @@ class Sync {
   protected $civicrmMemberRoles;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * Sync constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
@@ -39,11 +47,14 @@ class Sync {
    *   Database.
    * @param \Drupal\civicrm_member_roles\CivicrmMemberRoles $memberRoles
    *   CiviCRM member roles service.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(TranslationInterface $stringTranslation, Connection $connection, CivicrmMemberRoles $memberRoles) {
+  public function __construct(TranslationInterface $stringTranslation, Connection $connection, CivicrmMemberRoles $memberRoles, MessengerInterface $messenger) {
     $this->stringTranslation = $stringTranslation;
     $this->connection = $connection;
     $this->civicrmMemberRoles = $memberRoles;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -104,13 +115,12 @@ class Sync {
   public function finished($success, array $results) {
     if ($success) {
       $message = $this->stringTranslation->formatPlural($results['processed'], 'One user processed.', '@count users processed.');
-      drupal_set_message($message);
+      $this->messenger->addStatus($message);
     }
     else {
       $message = $this->t('Encountered errors while performing sync.');
-      drupal_set_message($message, 'error');
+      $this->messenger->addError($message);
     }
-
   }
 
   /**

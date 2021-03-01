@@ -6,6 +6,7 @@ use Drupal\civicrm_member_roles\CivicrmMemberRoles;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Messenger\MessengerInterface;
 
 /**
  * Class CivicrmMemberRoleRuleForm.
@@ -24,16 +25,26 @@ class CivicrmMemberRoleRuleForm extends EntityForm {
    *
    * @param \Drupal\civicrm_member_roles\CivicrmMemberRoles $memberRoles
    *   CiviCRM member roles service.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger service.
    */
-  public function __construct(CivicrmMemberRoles $memberRoles) {
+  public function __construct(CivicrmMemberRoles $memberRoles, MessengerInterface $messenger) {
     $this->memberRoles = $memberRoles;
+    $this->messenger = $messenger;
   }
+
+  /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static($container->get('civicrm_member_roles'));
+    return new static($container->get('civicrm_member_roles'), $container->get('messenger'));
   }
 
   /**
@@ -137,13 +148,13 @@ class CivicrmMemberRoleRuleForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label rule.', [
+        $this->messenger->addStatus($this->t('Created the %label rule.', [
           '%label' => $rule->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label rule.', [
+        $this->messenger->addStatus($this->t('Saved the %label rule.', [
           '%label' => $rule->label(),
         ]));
     }
