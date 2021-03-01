@@ -2,8 +2,11 @@
 
 namespace Drupal\civicrm_member_roles\Batch;
 
+use Drupal\civicrm_member_roles\CivicrmMemberRoles;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Database\Connection;
 
 /**
  * Class Sync.
@@ -11,15 +14,36 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 class Sync {
 
   use StringTranslationTrait;
+  use DependencySerializationTrait;
+
+  /**
+   * Database.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
+   * CiviCRM member roles service.
+   *
+   * @var \Drupal\civicrm_member_roles\CivicrmMemberRoles
+   */
+  protected $civicrmMemberRoles;
 
   /**
    * Sync constructor.
    *
    * @param \Drupal\Core\StringTranslation\TranslationInterface $stringTranslation
    *   The string translation service.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   Database.
+   * @param \Drupal\civicrm_member_roles\CivicrmMemberRoles $memberRoles
+   *   CiviCRM member roles service.
    */
-  public function __construct(TranslationInterface $stringTranslation) {
+  public function __construct(TranslationInterface $stringTranslation, Connection $connection, CivicrmMemberRoles $memberRoles) {
     $this->stringTranslation = $stringTranslation;
+    $this->connection = $connection;
+    $this->civicrmMemberRoles = $memberRoles;
   }
 
   /**
@@ -99,20 +123,17 @@ class Sync {
    *   The CiviCRM member roles service.
    */
   protected function getCivicrmMemberRoles() {
-    return \Drupal::service('civicrm_member_roles');
+    return $this->civicrmMemberRoles;
   }
 
   /**
-   * Get the database connection.
-   *
-   * This is called directly from the Drupal object to avoid dealing with
-   * serialization.
+   * Gets the database.
    *
    * @return \Drupal\Core\Database\Connection
-   *   The database connection.
+   *   The database.
    */
   protected function getDatabase() {
-    return \Drupal::database();
+    return $this->connection;
   }
 
 }

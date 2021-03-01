@@ -49,8 +49,8 @@ class SettingsForm extends ConfigFormBase {
 
     $form['settings']['cron_limit'] = [
       '#type' => 'number',
-      '#title' => t('Memberships Synchronized on Cron'),
-      '#description' => t('Enter how many Memberships and Roles you would like to synchronize per cron run. Synchronization will be performed randomly. This prevents the operation from timing out when too many items are processed at once. If this is empty, all Memberships and Roles will be processed.'),
+      '#title' => $this->t('Memberships Synchronized on Cron'),
+      '#description' => $this->t('Enter how many Memberships and Roles you would like to synchronize per cron run. Synchronization will be performed randomly. This prevents the operation from timing out when too many items are processed at once. If this is empty, all Memberships and Roles will be processed.'),
       '#default_value' => $config->get('cron_limit'),
       '#min' => 0,
       '#step' => 1,

@@ -4,14 +4,18 @@ namespace Drupal\civicrm_member_roles;
 
 use Drupal\civicrm\Civicrm;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
+use Drupal\Core\Database\Connection;
 
 /**
  * Class CivicrmMemberRoles.
  */
 class CivicrmMemberRoles {
+
+  use DependencySerializationTrait;
 
   /**
    * CiviCRM service.
@@ -35,6 +39,13 @@ class CivicrmMemberRoles {
   protected $entityTypeManager;
 
   /**
+   * Database.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $connection;
+
+  /**
    * Inactive status IDs.
    *
    * Call ::getInactiveStatusIds instead of directly accessing this property.
@@ -52,11 +63,14 @@ class CivicrmMemberRoles {
    *   Config factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   Entity type manager service.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   Database.
    */
-  public function __construct(Civicrm $civicrm, ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(Civicrm $civicrm, ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager, Connection $connection) {
     $this->civicrm = $civicrm;
     $this->config = $configFactory->get('civicrm_member_roles.settings');
     $this->entityTypeManager = $entityTypeManager;
+    $this->connection = $connection;
   }
 
   /**
@@ -181,7 +195,8 @@ class CivicrmMemberRoles {
    *   The assignment rules.
    */
   protected function getRules() {
-    return $this->entityTypeManager->getStorage('civicrm_member_role_rule')->loadMultiple();
+    return $this->entityTypeManager->getStorage('civicrm_member_role_rule')
+      ->loadMultiple();
   }
 
   /**
@@ -441,7 +456,7 @@ class CivicrmMemberRoles {
    *   The database.
    */
   protected function getDatabase() {
-    return \Drupal::database();
+    return $this->connection;
   }
 
 }
