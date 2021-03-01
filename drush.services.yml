@@ -1,0 +1,5 @@
+services:
+  civicrm_member_roles.drush:
+    class: 'Drupal\civicrm_member_roles\Commands\Drush'
+    tags:
+      - { name: drush.command }
