@@ -86,22 +86,6 @@ class CivicrmMemberRoleRuleListBuilder extends ConfigEntityListBuilder {
   }
 
   /**
-   * Gets the name for a specified role.
-   *
-   * @param string $rid
-   *   The role ID.
-   *
-   * @return string
-   *   The role name, or the ID if not found.
-   */
-  protected function getRoleName($rid) {
-    if (!$role = Role::load($rid)) {
-      return $rid;
-    }
-    return $role->label();
-  }
-
-  /**
    * Gets the name for a specified membership type.
    *
    * @param int $typeId
@@ -115,6 +99,22 @@ class CivicrmMemberRoleRuleListBuilder extends ConfigEntityListBuilder {
       return $typeId;
     }
     return $type['name'];
+  }
+
+  /**
+   * Gets the name for a specified role.
+   *
+   * @param string $rid
+   *   The role ID.
+   *
+   * @return string
+   *   The role name, or the ID if not found.
+   */
+  protected function getRoleName($rid) {
+    if (!$role = Role::load($rid)) {
+      return $rid;
+    }
+    return $role->label();
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\civicrm_member_roles\Form;
 
+use Drupal;
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -21,13 +22,6 @@ class CivicrmMemberRoleRuleDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelUrl() {
-    return new Url('entity.civicrm_member_role_rule.collection');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getConfirmText() {
     return $this->t('Delete');
   }
@@ -38,8 +32,15 @@ class CivicrmMemberRoleRuleDeleteForm extends EntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
     $message = $this->t('Deleted association rule @label.', ['@label' => $this->entity->label()]);
-    \Drupal::messenger()->addStatus($message);
+    Drupal::messenger()->addStatus($message);
     $form_state->setRedirectUrl($this->getCancelUrl());
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCancelUrl() {
+    return new Url('entity.civicrm_member_role_rule.collection');
   }
 
 }

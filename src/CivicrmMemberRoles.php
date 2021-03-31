@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
 use Drupal\Core\Database\Connection;
+use Exception;
 
 /**
  * Class CivicrmMemberRoles.
@@ -109,7 +110,7 @@ class CivicrmMemberRoles {
       $this->civicrm->initialize();
       $result = civicrm_api3('MembershipType', 'getsingle', ['id' => $id]);
     }
-    catch (\Exception $e) {
+    catch (Exception $e) {
       $result = NULL;
     }
 
@@ -200,39 +201,13 @@ class CivicrmMemberRoles {
   }
 
   /**
-   * Sync membership roles for a user account.
+   * Gets the database.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user account.
+   * @return \Drupal\Core\Database\Connection
+   *   The database.
    */
-  public function syncUser(AccountInterface $account) {
-    if (!$contactId = $this->getUserContactId($account)) {
-      return;
-    }
-
-    $this->syncContact($contactId, $account);
-  }
-
-  /**
-   * Obtain the contact for a user.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user account.
-   *
-   * @return int|null
-   *   The contact ID, or NULL if not found.
-   */
-  public function getUserContactId(AccountInterface $account) {
-    try {
-      $params = ['uf_id' => $account->id()];
-      $this->civicrm->initialize();
-      $result = civicrm_api3('UFMatch', 'getsingle', $params);
-    }
-    catch (\Exception $e) {
-      return NULL;
-    }
-
-    return $result['contact_id'];
+  protected function getDatabase() {
+    return $this->connection;
   }
 
   /**
@@ -250,37 +225,11 @@ class CivicrmMemberRoles {
       $params = ['contact_id' => $cid];
       $result = civicrm_api3('UFMatch', 'getsingle', $params);
     }
-    catch (\Exception $e) {
+    catch (Exception $e) {
       return NULL;
     }
 
     return $this->entityTypeManager->getStorage('user')->load($result['uf_id']);
-  }
-
-  /**
-   * Get membership data for a contact.
-   *
-   * @param int $contactId
-   *   The contact ID.
-   *
-   * @return array
-   *   Contact membership data.
-   */
-  protected function getContactMemberships($contactId) {
-    $params = [
-      'contact_id' => $contactId,
-      'options' => ['limit' => 0],
-    ];
-
-    try {
-      $this->civicrm->initialize();
-      $result = civicrm_api3('membership', 'get', $params);
-    }
-    catch (\Exception $e) {
-      return [];
-    }
-
-    return $result['values'];
   }
 
   /**
@@ -325,6 +274,32 @@ class CivicrmMemberRoles {
   }
 
   /**
+   * Get membership data for a contact.
+   *
+   * @param int $contactId
+   *   The contact ID.
+   *
+   * @return array
+   *   Contact membership data.
+   */
+  protected function getContactMemberships($contactId) {
+    $params = [
+      'contact_id' => $contactId,
+      'options' => ['limit' => 0],
+    ];
+
+    try {
+      $this->civicrm->initialize();
+      $result = civicrm_api3('membership', 'get', $params);
+    }
+    catch (Exception $e) {
+      return [];
+    }
+
+    return $result['values'];
+  }
+
+  /**
    * Gets IDs of inactive statuses.
    *
    * @return array
@@ -345,7 +320,7 @@ class CivicrmMemberRoles {
           return $item['id'];
         }, $result['values']);
       }
-      catch (\Exception $e) {
+      catch (Exception $e) {
         $this->inactiveStatusIds = [];
       }
     }
@@ -367,53 +342,6 @@ class CivicrmMemberRoles {
 
     foreach ($rules as $rule) {
       $roles[] = $rule->getRole();
-    }
-
-    return array_unique($roles);
-  }
-
-  /**
-   * Gets the user for a user account.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user account.
-   *
-   * @return \Drupal\user\UserInterface
-   *   The user entity.
-   */
-  protected function getAccountUser(AccountInterface $account) {
-    if ($account instanceof UserInterface) {
-      return $account;
-    }
-
-    return $this->entityTypeManager->getStorage('user')->load($account->id());
-  }
-
-  /**
-   * Gets roles to add for a contact's memberships.
-   *
-   * @param \Drupal\civicrm_member_roles\Entity\CivicrmMemberRoleRuleInterface[] $rules
-   *   Assignment rules.
-   * @param array $memberships
-   *   Contact membership data.
-   *
-   * @return array
-   *   The roles to add for a contact.
-   */
-  protected function getAddRoles(array $rules, array $memberships) {
-    $roles = [];
-
-    foreach ($memberships as $membership) {
-      // Find rules applicable to the membership type.
-      $membershipRules = array_filter($rules, function ($rule) use ($membership) {
-        /* @var \Drupal\civicrm_member_roles\Entity\CivicrmMemberRoleRuleInterface */
-        return $rule->getType() == $membership['membership_type_id'];
-      });
-      foreach ($membershipRules as $rule) {
-        if (in_array($membership['status_id'], $rule->getCurrentStatuses())) {
-          $roles[] = $rule->getRole();
-        }
-      }
     }
 
     return array_unique($roles);
@@ -450,13 +378,86 @@ class CivicrmMemberRoles {
   }
 
   /**
-   * Gets the database.
+   * Gets roles to add for a contact's memberships.
    *
-   * @return \Drupal\Core\Database\Connection
-   *   The database.
+   * @param \Drupal\civicrm_member_roles\Entity\CivicrmMemberRoleRuleInterface[] $rules
+   *   Assignment rules.
+   * @param array $memberships
+   *   Contact membership data.
+   *
+   * @return array
+   *   The roles to add for a contact.
    */
-  protected function getDatabase() {
-    return $this->connection;
+  protected function getAddRoles(array $rules, array $memberships) {
+    $roles = [];
+
+    foreach ($memberships as $membership) {
+      // Find rules applicable to the membership type.
+      $membershipRules = array_filter($rules, function ($rule) use ($membership) {
+        /* @var \Drupal\civicrm_member_roles\Entity\CivicrmMemberRoleRuleInterface */
+        return $rule->getType() == $membership['membership_type_id'];
+      });
+      foreach ($membershipRules as $rule) {
+        if (in_array($membership['status_id'], $rule->getCurrentStatuses())) {
+          $roles[] = $rule->getRole();
+        }
+      }
+    }
+
+    return array_unique($roles);
+  }
+
+  /**
+   * Gets the user for a user account.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The user entity.
+   */
+  protected function getAccountUser(AccountInterface $account) {
+    if ($account instanceof UserInterface) {
+      return $account;
+    }
+
+    return $this->entityTypeManager->getStorage('user')->load($account->id());
+  }
+
+  /**
+   * Sync membership roles for a user account.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account.
+   */
+  public function syncUser(AccountInterface $account) {
+    if (!$contactId = $this->getUserContactId($account)) {
+      return;
+    }
+
+    $this->syncContact($contactId, $account);
+  }
+
+  /**
+   * Obtain the contact for a user.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account.
+   *
+   * @return int|null
+   *   The contact ID, or NULL if not found.
+   */
+  public function getUserContactId(AccountInterface $account) {
+    try {
+      $params = ['uf_id' => $account->id()];
+      $this->civicrm->initialize();
+      $result = civicrm_api3('UFMatch', 'getsingle', $params);
+    }
+    catch (Exception $e) {
+      return NULL;
+    }
+
+    return $result['contact_id'];
   }
 
 }

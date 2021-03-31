@@ -12,14 +12,17 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *   label = @Translation("Association Rule"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "list_builder" = "Drupal\civicrm_member_roles\CivicrmMemberRoleRuleListBuilder",
+ *     "list_builder" =
+ *   "Drupal\civicrm_member_roles\CivicrmMemberRoleRuleListBuilder",
  *     "form" = {
  *       "add" = "Drupal\civicrm_member_roles\Form\CivicrmMemberRoleRuleForm",
  *       "edit" = "Drupal\civicrm_member_roles\Form\CivicrmMemberRoleRuleForm",
- *       "delete" = "Drupal\civicrm_member_roles\Form\CivicrmMemberRoleRuleDeleteForm"
+ *       "delete" =
+ *   "Drupal\civicrm_member_roles\Form\CivicrmMemberRoleRuleDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\civicrm_member_roles\CivicrmMemberRoleRuleHtmlRouteProvider",
+ *       "html" =
+ *   "Drupal\civicrm_member_roles\CivicrmMemberRoleRuleHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "civicrm_member_role_rule",
@@ -30,10 +33,13 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}",
+ *     "canonical" =
+ *   "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}",
  *     "add-form" = "/admin/config/civicrm/civicrm-member-roles/rule/add",
- *     "edit-form" = "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}/edit",
- *     "delete-form" = "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}/delete",
+ *     "edit-form" =
+ *   "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}/edit",
+ *     "delete-form" =
+ *   "/admin/config/civicrm/civicrm-member-roles/rule/{civicrm_member_role_rule}/delete",
  *     "collection" = "/admin/config/civicrm/civicrm-member-roles"
  *   },
  *   config_export = {

@@ -21,6 +21,13 @@ class CivicrmMemberRoleRuleForm extends EntityForm {
   protected $memberRoles;
 
   /**
+   * The messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
+
+  /**
    * CivicrmMemberRoleRuleForm constructor.
    *
    * @param \Drupal\civicrm_member_roles\CivicrmMemberRoles $memberRoles
@@ -32,13 +39,6 @@ class CivicrmMemberRoleRuleForm extends EntityForm {
     $this->memberRoles = $memberRoles;
     $this->messenger = $messenger;
   }
-
-  /**
-   * The messenger service.
-   *
-   * @var \Drupal\Core\Messenger\MessengerInterface
-   */
-  protected $messenger;
 
   /**
    * {@inheritdoc}

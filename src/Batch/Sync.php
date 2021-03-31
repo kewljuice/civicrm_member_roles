@@ -105,6 +105,19 @@ class Sync {
   }
 
   /**
+   * Get CiviCRM member roles service.
+   *
+   * This is called directly from the Drupal object to avoid dealing with
+   * serialization.
+   *
+   * @return \Drupal\civicrm_member_roles\CivicrmMemberRoles
+   *   The CiviCRM member roles service.
+   */
+  protected function getCivicrmMemberRoles() {
+    return $this->civicrmMemberRoles;
+  }
+
+  /**
    * Batch finished callback.
    *
    * @param bool $success
@@ -121,19 +134,6 @@ class Sync {
       $message = $this->t('Encountered errors while performing sync.');
       $this->messenger->addError($message);
     }
-  }
-
-  /**
-   * Get CiviCRM member roles service.
-   *
-   * This is called directly from the Drupal object to avoid dealing with
-   * serialization.
-   *
-   * @return \Drupal\civicrm_member_roles\CivicrmMemberRoles
-   *   The CiviCRM member roles service.
-   */
-  protected function getCivicrmMemberRoles() {
-    return $this->civicrmMemberRoles;
   }
 
   /**

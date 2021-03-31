@@ -2,12 +2,13 @@
 
 namespace Drupal\civicrm_member_roles\Commands;
 
+use Drupal;
 use Drush\Commands\DrushCommands;
 
 /**
  * A drush command file.
  *
- * @package Drupal\ctrl_drush_clear_ftp\Commands
+ * @package Drupal\civicrm_member_roles\Commands
  */
 class Drush extends DrushCommands {
 
@@ -18,6 +19,7 @@ class Drush extends DrushCommands {
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   *
    * @command civicrm-member-role-sync:civicrm-member-role-sync
    * @aliases cmrs
    * @usage cmrs
@@ -29,9 +31,9 @@ class Drush extends DrushCommands {
     'contact_id' => NULL,
   ]) {
     /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-    $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+    $civicrm_member_roles = Drupal::service('civicrm_member_roles');
     if (isset($options['uid']) && $uid = $options['uid']) {
-      $storage = \Drupal::entityTypeManager()->getStorage('user');
+      $storage = Drupal::entityTypeManager()->getStorage('user');
       if (!$account = $storage->load($uid)) {
         $this->output()
           ->writeln(print_r(dt('Unable to load user ID @uid.', ['@uid' => $uid]), TRUE));
@@ -55,7 +57,8 @@ class Drush extends DrushCommands {
         }
       }
       else {
-        $batch = \Drupal::service('civicrm_member_roles.batch.sync')->getBatch();
+        $batch = Drupal::service('civicrm_member_roles.batch.sync')
+          ->getBatch();
         $batch['progressive'] = FALSE;
         batch_set($batch);
         drush_backend_batch_process();

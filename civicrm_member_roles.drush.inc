@@ -29,10 +29,10 @@ function civicrm_member_roles_drush_command() {
  */
 function drush_civicrm_member_roles_civicrm_member_role_sync() {
   /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-  $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+  $civicrm_member_roles = Drupal::service('civicrm_member_roles');
 
   if ($uid = drush_get_option('uid')) {
-    $storage = \Drupal::entityTypeManager()->getStorage('user');
+    $storage = Drupal::entityTypeManager()->getStorage('user');
     if (!$account = $storage->load($uid)) {
       return drush_log(dt('Unable to load user ID @uid.', ['@uid' => $uid]), 'error');
     }
@@ -47,7 +47,7 @@ function drush_civicrm_member_roles_civicrm_member_role_sync() {
     return drush_log(dt('Successfully synced contact ID @cid.', ['@cid' => $contact_id]), 'ok');
   }
 
-  $batch = \Drupal::service('civicrm_member_roles.batch.sync')->getBatch();
+  $batch = Drupal::service('civicrm_member_roles.batch.sync')->getBatch();
   $batch['progressive'] = FALSE;
   batch_set($batch);
   drush_backend_batch_process();

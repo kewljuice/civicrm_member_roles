@@ -11,13 +11,13 @@ use Drupal\Core\Session\AccountInterface;
  * Implements hook_user_login().
  */
 function civicrm_member_roles_user_login(AccountInterface $account) {
-  $config = \Drupal::config('civicrm_member_roles.settings');
+  $config = Drupal::config('civicrm_member_roles.settings');
   if (!in_array('login', $config->get('sync_method'))) {
     return;
   }
 
   /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-  $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+  $civicrm_member_roles = Drupal::service('civicrm_member_roles');
   $civicrm_member_roles->syncUser($account);
 }
 
@@ -25,13 +25,13 @@ function civicrm_member_roles_user_login(AccountInterface $account) {
  * Implements hook_user_login().
  */
 function civicrm_member_roles_user_logout(AccountInterface $account) {
-  $config = \Drupal::config('civicrm_member_roles.settings');
+  $config = Drupal::config('civicrm_member_roles.settings');
   if (!in_array('login', $config->get('sync_method'))) {
     return;
   }
 
   /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-  $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+  $civicrm_member_roles = Drupal::service('civicrm_member_roles');
   $civicrm_member_roles->syncUser($account);
 }
 
@@ -39,10 +39,10 @@ function civicrm_member_roles_user_logout(AccountInterface $account) {
  * Implements hook_cron().
  */
 function civicrm_member_roles_cron() {
-  $config = \Drupal::config('civicrm_member_roles.settings');
+  $config = Drupal::config('civicrm_member_roles.settings');
   if (in_array('cron', $config->get('sync_method'))) {
     /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-    $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+    $civicrm_member_roles = Drupal::service('civicrm_member_roles');
     $civicrm_member_roles->sync($config->get('cron_limit'));
   }
 }
@@ -66,13 +66,13 @@ function civicrm_member_roles_civicrm_post($op, $objname, $objid, &$objref) {
   }
 
   // Only act when configured for "update".
-  $config = \Drupal::config('civicrm_member_roles.settings');
+  $config = Drupal::config('civicrm_member_roles.settings');
   if (!in_array('update', $config->get('sync_method'))) {
     return;
   }
 
   /** @var \Drupal\civicrm_member_roles\CivicrmMemberRoles $civicrm_member_roles */
-  $civicrm_member_roles = \Drupal::service('civicrm_member_roles');
+  $civicrm_member_roles = Drupal::service('civicrm_member_roles');
   if ($account = $civicrm_member_roles->getContactAccount($objref->contact_id)) {
     $civicrm_member_roles->syncContact($objref->contact_id, $account);
   }
