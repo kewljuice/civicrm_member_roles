@@ -16,6 +16,7 @@ class Drush extends DrushCommands {
    * Drush command for CiviMember Roles Sync..
    *
    * @param array $options
+   *   Array containing CLI options.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
@@ -26,7 +27,7 @@ class Drush extends DrushCommands {
    * @options uid Optional User ID.
    * @options contact_id Optional Contact ID.
    */
-  public function drush_cmrs($options = [
+  public function drushcmrs(array $options = [
     'uid' => NULL,
     'contact_id' => NULL,
   ]) {
